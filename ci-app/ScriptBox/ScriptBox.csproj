@@ -1,28 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- Tipo do app -->
     <OutputType>WinExe</OutputType>
 
-    <!-- TARGET CORRETO PARA UWP MODERNO -->
+    <!-- Target correto para UWP moderno -->
     <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
 
-    <!-- ATIVA UWP -->
+    <!-- UWP (OBRIGATÓRIO) -->
+    <UseUwp>true</UseUwp>
     <UseUwpTools>true</UseUwpTools>
-    <EnableMsixTooling>true</EnableMsixTooling>
 
-    <!-- PLATAFORMA -->
+    <!-- Plataforma -->
     <Platforms>x64</Platforms>
 
-    <!-- EMPACOTAMENTO -->
+    <!-- Empacotamento MSIX -->
     <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
-    <AppxPackageDir>..\OUTPUT\</AppxPackageDir>
     <AppxBundle>Never</AppxBundle>
     <UapAppxPackageBuildMode>StoreUpload</UapAppxPackageBuildMode>
 
-    <!-- EVITA AUTO-INCREMENTO -->
+    <!-- Diretório do pacote -->
+    <AppxPackageDir>..\OUTPUT\</AppxPackageDir>
+
+    <!-- Evita incremento automático -->
     <AppxAutoIncrementPackageRevision>false</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
 
+  <!-- Manifesto UWP -->
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
   </ItemGroup>
