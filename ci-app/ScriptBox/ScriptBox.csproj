@@ -3,14 +3,28 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
 
-    <!-- UWP moderno precisa de SDK novo -->
+    <!-- TARGET CORRETO PARA UWP MODERNO -->
     <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
 
-    <UseUWP>true</UseUWP>
+    <!-- ATIVA UWP -->
+    <UseUwpTools>true</UseUwpTools>
+    <EnableMsixTooling>true</EnableMsixTooling>
+
+    <!-- PLATAFORMA -->
     <Platforms>x64</Platforms>
 
-    <!-- NÃO definir RuntimeIdentifier em UWP -->
+    <!-- EMPACOTAMENTO -->
     <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
+    <AppxPackageDir>..\OUTPUT\</AppxPackageDir>
+    <AppxBundle>Never</AppxBundle>
+    <UapAppxPackageBuildMode>StoreUpload</UapAppxPackageBuildMode>
+
+    <!-- EVITA AUTO-INCREMENTO -->
+    <AppxAutoIncrementPackageRevision>false</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
 
 </Project>
