@@ -2,22 +2,20 @@
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-  IgnorableNamespaces="uap">
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
 
-  <!-- Identidade do pacote -->
   <Identity
     Name="ScriptBox.UWP"
     Publisher="CN=ScriptBox"
     Version="1.0.0.0" />
 
-  <!-- Informações básicas -->
   <Properties>
     <DisplayName>ScriptBox</DisplayName>
     <PublisherDisplayName>ScriptBox</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
-  <!-- SDK / Plataforma -->
   <Dependencies>
     <TargetDeviceFamily
       Name="Windows.Universal"
@@ -25,19 +23,21 @@
       MaxVersionTested="10.0.26100.0" />
   </Dependencies>
 
-  <!-- Aplicação -->
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
   <Applications>
     <Application
       Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="ScriptBox.App">
+      EntryPoint="Windows.FullTrustApplication">
 
       <uap:VisualElements
         DisplayName="ScriptBox"
-        Description="ScriptBox UWP App"
-        BackgroundColor="black"
         Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png" />
+        Square44x44Logo="Assets\Square44x44Logo.png"
+        BackgroundColor="transparent" />
     </Application>
   </Applications>
 
