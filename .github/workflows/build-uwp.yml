@@ -16,29 +16,35 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
+    # 🔐 Decodifica o PFX salvo em Base64 nos Secrets
     - name: Decode PFX
       shell: powershell
       run: |
         $bytes = [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}")
         [System.IO.File]::WriteAllBytes("signing.pfx", $bytes)
 
+    # 📦 Restaura pacotes
     - name: Restore NuGet
       run: nuget restore ci-app/ScriptBox.sln
 
+    # 🏗️ Build UWP + geração do MSIX em pasta FIXA
     - name: Build UWP
+      shell: powershell
       run: |
         msbuild ci-app/ScriptBox.sln `
           /p:Configuration=Release `
           /p:Platform=x64 `
           /p:UapAppxPackageBuildMode=StoreUpload `
           /p:AppxBundle=Never `
+          /p:AppxPackageDir=ci-app/OUTPUT/ `
           /p:PackageCertificateKeyFile=signing.pfx `
           /p:PackageCertificatePassword="${{ secrets.PFX_PASSWORD }}"
 
+    # 📤 Upload do MSIX/Appx gerado
     - name: Upload MSIX
       uses: actions/upload-artifact@v4
       with:
         name: ScriptBox-MSIX
         path: |
-          ci-app/ScriptBox/AppPackages/**/*.msix
-          ci-app/ScriptBox/AppPackages/**/*.appx
+          ci-app/OUTPUT/**/*.msix
+          ci-app/OUTPUT/**/*.appx
