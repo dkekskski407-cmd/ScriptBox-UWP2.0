@@ -2,10 +2,14 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
+
+    <!-- UWP moderno precisa de SDK novo -->
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+
     <UseUWP>true</UseUWP>
     <Platforms>x64</Platforms>
-    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+
+    <!-- NÃO definir RuntimeIdentifier em UWP -->
     <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
   </PropertyGroup>
 
