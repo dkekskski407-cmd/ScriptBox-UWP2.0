@@ -1,0 +1,45 @@
+name: Build ScriptBox UWP
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Decode PFX
+      shell: pwsh
+      run: |
+        $pfx = "${{ secrets.PFX_BASE64 }}"
+        [IO.File]::WriteAllBytes("signing.pfx",[Convert]::FromBase64String($pfx))
+
+    - name: Restore NuGet
+      run: nuget restore ci-app/ScriptBox.sln
+
+    - name: Build UWP
+      run: |
+        msbuild ci-app/ScriptBox.sln `
+          /p:Configuration=Release `
+          /p:Platform=x64 `
+          /p:AppxBundle=Always `
+          /p:AppxBundlePlatforms="x64" `
+          /p:UapAppxPackageBuildMode=StoreUpload `
+          /p:PackageCertificateKeyFile=signing.pfx `
+          /p:PackageCertificatePassword="${{ secrets.PFX_PASSWORD }}"
+
+    - name: Upload MSIX
+      uses: actions/upload-artifact@v4
+      with:
+        name: ScriptBox-UWP-MSIX
+        path: |
+          **/*.msix
+          **/*.appxbundle
