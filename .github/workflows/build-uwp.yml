@@ -1,4 +1,4 @@
-name: Build ScriptBox UWP
+name: Build CI App
 
 on:
   push:
@@ -17,10 +17,10 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Decode PFX
-      shell: pwsh
+      shell: powershell
       run: |
-        $pfx = "${{ secrets.PFX_BASE64 }}"
-        [IO.File]::WriteAllBytes("signing.pfx",[Convert]::FromBase64String($pfx))
+        $bytes = [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}")
+        [System.IO.File]::WriteAllBytes("signing.pfx", $bytes)
 
     - name: Restore NuGet
       run: nuget restore ci-app/ScriptBox.sln
@@ -30,16 +30,15 @@ jobs:
         msbuild ci-app/ScriptBox.sln `
           /p:Configuration=Release `
           /p:Platform=x64 `
-          /p:AppxBundle=Always `
-          /p:AppxBundlePlatforms="x64" `
           /p:UapAppxPackageBuildMode=StoreUpload `
+          /p:AppxBundle=Never `
           /p:PackageCertificateKeyFile=signing.pfx `
           /p:PackageCertificatePassword="${{ secrets.PFX_PASSWORD }}"
 
     - name: Upload MSIX
       uses: actions/upload-artifact@v4
       with:
-        name: ScriptBox-UWP-MSIX
+        name: ScriptBox-MSIX
         path: |
           **/*.msix
-          **/*.appxbundle
+          **/*.appx
