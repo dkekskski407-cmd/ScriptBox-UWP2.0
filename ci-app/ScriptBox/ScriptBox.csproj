@@ -6,6 +6,7 @@
     <UseUWP>true</UseUWP>
     <Platforms>x64</Platforms>
     <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+    <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
   </PropertyGroup>
 
 </Project>
