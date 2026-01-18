@@ -10,52 +10,47 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    # 1️⃣ Checkout do repositório
     - name: Checkout repo
       uses: actions/checkout@v4
 
-    # 2️⃣ Setup do MSBuild (Visual Studio 2022)
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    # 3️⃣ Decodificar certificado PFX (Base64 → .pfx)
     - name: Decode PFX
       shell: powershell
       run: |
         $bytes = [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}")
         [System.IO.File]::WriteAllBytes("signing.pfx", $bytes)
 
-    # 4️⃣ Restore NuGet
     - name: Restore NuGet
       run: nuget restore ci-app/ScriptBox.sln
 
-    # 5️⃣ Build UWP + gerar MSIX/AppX
-    - name: Build UWP and generate MSIX
+    # 🔥 BUILD + GERAR MSIX OBRIGATORIAMENTE
+    - name: Build UWP + Generate MSIX
       shell: powershell
       run: |
+        mkdir ci-app\OUTPUT -Force
+
         msbuild ci-app/ScriptBox.sln `
           /p:Configuration=Release `
           /p:Platform=x64 `
+          /p:GenerateAppxPackageOnBuild=true `
           /p:UapAppxPackageBuildMode=StoreUpload `
           /p:AppxBundle=Never `
-          /p:GenerateAppxPackageOnBuild=true `
+          /p:AppxPackageDir=ci-app\OUTPUT\ `
           /p:PackageCertificateKeyFile=signing.pfx `
           /p:PackageCertificatePassword="${{ secrets.PFX_PASSWORD }}"
 
-    # 6️⃣ Listar arquivos gerados (debug – NÃO remover)
-    - name: List generated files
+    # 🔎 DEBUG (ESSENCIAL)
+    - name: List generated packages
       shell: powershell
       run: |
-        Write-Host "==== MSIX files ===="
-        Get-ChildItem -Recurse -Filter *.msix
-        Write-Host "==== APPX files ===="
-        Get-ChildItem -Recurse -Filter *.appx
+        Write-Host "==== OUTPUT DIR ===="
+        Get-ChildItem ci-app\OUTPUT -Recurse
 
-    # 7️⃣ Upload do MSIX/AppX (caminho UNIVERSAL – sem erro)
+    # 📦 UPLOAD GARANTIDO
     - name: Upload MSIX
       uses: actions/upload-artifact@v4
       with:
         name: ScriptBox-MSIX
-        path: |
-          **/*.msix
-          **/*.appx
+        path: ci-app/OUTPUT/**/*.*
