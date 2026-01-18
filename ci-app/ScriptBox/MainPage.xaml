@@ -5,9 +5,9 @@
 
     <Grid Background="Black">
         <TextBlock
-            Text="ScriptBox UWP"
+            Text="ScriptBox rodando no Xbox Dev Mode"
             Foreground="White"
-            FontSize="28"
+            FontSize="24"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"/>
     </Grid>
