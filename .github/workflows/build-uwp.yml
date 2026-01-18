@@ -16,18 +16,15 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    # 🔐 Decode certificate
     - name: Decode PFX
       shell: powershell
       run: |
         $bytes = [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}")
         [System.IO.File]::WriteAllBytes("signing.pfx", $bytes)
 
-    # 📦 Restore NuGet
     - name: Restore NuGet
       run: nuget restore ci-app/ScriptBox.sln
 
-    # 🏗️ BUILD + GERAR MSIX (AQUI ESTAVA O PROBLEMA)
     - name: Build UWP + Generate MSIX
       shell: powershell
       run: |
@@ -37,21 +34,19 @@ jobs:
           /p:GenerateAppxPackageOnBuild=true `
           /p:UapAppxPackageBuildMode=StoreUpload `
           /p:AppxBundle=Never `
-          /p:AppxPackageDir=ci-app/OUTPUT\ `
           /p:PackageCertificateKeyFile=signing.pfx `
           /p:PackageCertificatePassword="${{ secrets.PFX_PASSWORD }}"
 
-    # 📂 Debug: listar arquivos gerados (IMPORTANTE)
     - name: List generated files
       shell: powershell
       run: |
         Get-ChildItem -Recurse ci-app
 
-    # 📤 Upload do pacote
+    # ✅ CAMINHO CORRETO
     - name: Upload MSIX
       uses: actions/upload-artifact@v4
       with:
         name: ScriptBox-MSIX
         path: |
-          ci-app/OUTPUT/**/*.msix
-          ci-app/OUTPUT/**/*.appx
+          ci-app/**/AppPackages/**/*.msix
+          ci-app/**/AppPackages/**/*.appx
