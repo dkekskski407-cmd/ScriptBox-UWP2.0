@@ -10,43 +10,52 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    # 1️⃣ Checkout do repositório
     - name: Checkout repo
       uses: actions/checkout@v4
 
+    # 2️⃣ Setup do MSBuild (Visual Studio 2022)
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
+    # 3️⃣ Decodificar certificado PFX (Base64 → .pfx)
     - name: Decode PFX
       shell: powershell
       run: |
         $bytes = [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}")
         [System.IO.File]::WriteAllBytes("signing.pfx", $bytes)
 
+    # 4️⃣ Restore NuGet
     - name: Restore NuGet
       run: nuget restore ci-app/ScriptBox.sln
 
-    - name: Build UWP + Generate MSIX
+    # 5️⃣ Build UWP + gerar MSIX/AppX
+    - name: Build UWP and generate MSIX
       shell: powershell
       run: |
         msbuild ci-app/ScriptBox.sln `
           /p:Configuration=Release `
           /p:Platform=x64 `
-          /p:GenerateAppxPackageOnBuild=true `
           /p:UapAppxPackageBuildMode=StoreUpload `
           /p:AppxBundle=Never `
+          /p:GenerateAppxPackageOnBuild=true `
           /p:PackageCertificateKeyFile=signing.pfx `
           /p:PackageCertificatePassword="${{ secrets.PFX_PASSWORD }}"
 
+    # 6️⃣ Listar arquivos gerados (debug – NÃO remover)
     - name: List generated files
       shell: powershell
       run: |
-        Get-ChildItem -Recurse ci-app
+        Write-Host "==== MSIX files ===="
+        Get-ChildItem -Recurse -Filter *.msix
+        Write-Host "==== APPX files ===="
+        Get-ChildItem -Recurse -Filter *.appx
 
-    # ✅ CAMINHO CORRETO
+    # 7️⃣ Upload do MSIX/AppX (caminho UNIVERSAL – sem erro)
     - name: Upload MSIX
       uses: actions/upload-artifact@v4
       with:
         name: ScriptBox-MSIX
         path: |
-          ci-app/**/AppPackages/**/*.msix
-          ci-app/**/AppPackages/**/*.appx
+          **/*.msix
+          **/*.appx
