@@ -40,5 +40,5 @@ jobs:
       with:
         name: ScriptBox-MSIX
         path: |
-          **/*.msix
-          **/*.appx
+          ci-app/ScriptBox/AppPackages/**/*.msix
+          ci-app/ScriptBox/AppPackages/**/*.appx
